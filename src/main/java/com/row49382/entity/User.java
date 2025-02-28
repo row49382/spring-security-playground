@@ -1,7 +1,6 @@
 package com.row49382.entity;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.Fetch;
 
 import java.util.List;
 
@@ -20,8 +19,7 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
+    @OneToMany(mappedBy = "userId", fetch = FetchType.EAGER)
     private List<Authorities> authorities;
 
     public long getId() {
