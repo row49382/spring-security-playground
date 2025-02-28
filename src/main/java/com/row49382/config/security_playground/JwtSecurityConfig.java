@@ -16,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -33,14 +34,15 @@ public class JwtSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/generateToken").permitAll()
-                        .requestMatchers("/api/v1/home").hasAuthority("ADMIN")
-                        .requestMatchers("/employee/**").hasAuthority("ROLE_ADMIN")
-                        .anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers("/auth/generateToken").permitAll();
+                    auth.requestMatchers("/api/v1/home").hasAuthority("admin");
+                    auth.requestMatchers("/employee/**").hasAuthority("user");
+                    auth.anyRequest().authenticated();
+                })
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(this.jwtAuthFilter, AuthorizationFilter.class)
                 .authenticationProvider(this.authenticationProvider())
+                .addFilterBefore(this.jwtAuthFilter, AuthorizationFilter.class)
                 .build();
     }
 
